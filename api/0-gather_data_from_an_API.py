@@ -12,9 +12,11 @@ def gather_data(employee_id):
     """
     Fetches employee data from API and displays TODO list progress.
     """
-    url_user = 'https://jsonplaceholder.typicode.com/users/{}'.format(employee_id)
-    url_tasks = 'https://jsonplaceholder.typicode.com/todos?userId={}'.format(employee_id)
-
+    url = 'https://jsonplaceholder.typicode.com/users/{}'
+    todo = 'https://jsonplaceholder.typicode.com/todos?userId={}'
+       url = url.format(employee_id)   
+       todo = todo.format(employee_id)
+    
     response_user = requests.get(url_user).json()
     response_tasks = requests.get(url_tasks).json()
 
