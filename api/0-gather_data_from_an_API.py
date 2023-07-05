@@ -29,7 +29,7 @@ def gather_data(employee_id):
     ))
 
     for task in tasks_completed:
-        print('\t {}'.format(task.get('title')))
+        print('\t{}'.format(task.get('title')))
 
 
 if __name__ == '__main__':
@@ -39,4 +39,3 @@ if __name__ == '__main__':
 
     employee_id = int(argv[1])
     gather_data(employee_id)
-
