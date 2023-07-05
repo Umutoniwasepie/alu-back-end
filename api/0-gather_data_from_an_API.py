@@ -1,45 +1,41 @@
 #!/usr/bin/python3
-""" just using some extra modules """
+
+"""
+Module: gather_data_from_an_API
+"""
+
 import requests
-import sys
+from sys import argv
 
 
-def getName():
-    """ getting user name """
-    payload = {'id': sys.argv[1]}
-    dataTwo = requests.get('https://jsonplaceholder.typicode.com/users',
-                           params=payload)
-    JDataTwo = dataTwo.json()
-    # print(JDataTwo[0]['name']
-    return JDataTwo[0]['name']
+def gather_data(employee_id):
+    """
+    Fetches employee data from API and displays TODO list progress.
+    """
+    url_user = 'https://jsonplaceholder.typicode.com/users/{}'.format(employee_id)
+    url_tasks = 'https://jsonplaceholder.typicode.com/todos?userId={}'.format(employee_id)
+
+    response_user = requests.get(url_user).json()
+    response_tasks = requests.get(url_tasks).json()
+
+    employee_name = response_user.get('name')
+    tasks_total = len(response_tasks)
+    tasks_completed = [task for task in response_tasks if task.get('completed')]
+
+    print('Employee {} is done with tasks({}/{}):'.format(
+        employee_name,
+        len(tasks_completed),
+        tasks_total
+    ))
+
+    for task in tasks_completed:
+        print('\t{}'.format(task.get('title')))
 
 
-def getTask():
-    """ get task numbers and todos done  """
-    data = requests.get('https://jsonplaceholder.typicode.com/todos')
-    ToDoList = []
-    taskToDo = 0
-    taskDone = 0
-    JData = data.json()
-    DataLength = len(JData)
-    for i in range(0, DataLength):
-        com = int(sys.argv[1])
-        if JData[i]['userId'] == com:
-            taskToDo += 1
-            if JData[i]['completed'] is True:
-                ToDoList.append(JData[i]['title'])
-                taskDone += 1
-    # print(taskToDo)
-    # print(taskDone)
-    # print(ToDoList)
-    print("Employee {} is done with tasks({}/{}):"
-          .format(getName(), taskDone, taskToDo))
-    Lvalue = len(ToDoList)
-    for j in range(0, Lvalue):
-        print("\t {}".format(ToDoList[j]))
+if __name__ == '__main__':
+    if len(argv) != 2:
+        print('Usage: {} employee_id'.format(argv[0]))
+        exit(1)
 
-""" addding docs everywhre """
-
-if __name__ == "__main__":
-    """ calling """
-    getTask()
+    employee_id = int(argv[1])
+    gather_data(employee_id)
