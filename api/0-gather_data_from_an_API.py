@@ -1,45 +1,26 @@
 #!/usr/bin/python3
-""" just using some extra modules """
+"""A python script that uses ths REST API"""
+
 import requests
 import sys
 
-
-def getName():
-    """ getting user name """
-    payload = {'id': sys.argv[1]}
-    dataTwo = requests.get('https://jsonplaceholder.typicode.com/users',
-                           params=payload)
-    JDataTwo = dataTwo.json()
-    # print(JDataTwo[0]['name']
-    return JDataTwo[0]['name']
-
-
-def getTask():
-    """ get task numbers and todos done  """
-    data = requests.get('https://jsonplaceholder.typicode.com/todos')
-    ToDoList = []
-    taskToDo = 0
-    taskDone = 0
-    JData = data.json()
-    DataLength = len(JData)
-    for i in range(0, DataLength):
-        com = int(sys.argv[1])
-        if JData[i]['userId'] == com:
-            taskToDo += 1
-            if JData[i]['completed'] is True:
-                ToDoList.append(JData[i]['title'])
-                taskDone += 1
-    # print(taskToDo)
-    # print(taskDone)
-    # print(ToDoList)
-    print("Employee {} is done with tasks({}/{}):"
-          .format(getName(), taskDone, taskToDo))
-    Lvalue = len(ToDoList)
-    for j in range(0, Lvalue):
-        print("\t {}".format(ToDoList[j]))
-
-""" addding docs everywhre """
+"""Functions for gathering data from an API"""
 
 if __name__ == "__main__":
-    """ calling """
-    getTask()
+  employee_id = sys.argv[1]
+  url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
+  todo = "https://jsonplaceholder.typicode.com/todos?userId={}"
+    todo = todo.format(employee_id)
+
+    user_info = requests.request("GET", url).json()
+    todo_info = requests.request("GET", todo).json()
+
+    employee_name = user_info.get("name")
+    total_tasks = list(filter(lambda x: (x["completed"] is True), todo_info))
+    task_com = len(total_tasks)
+    total_task_done = len(todo_info)
+
+    print("Employee {} is done with tasks({}/{}):".format(employee_name,
+          task_com, total_task_done))
+
+    [print("\t {}".format(task.get("title"))) for task in total_tasks]
