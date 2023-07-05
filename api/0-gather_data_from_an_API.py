@@ -1,26 +1,42 @@
 #!/usr/bin/python3
-"""A python script that uses ths REST API"""
+
+"""
+Module: gather_data_from_an_API
+"""
 
 import requests
-import sys
+from sys import argv
 
-"""Functions for gathering data from an API"""
 
-if __name__ == "__main__":
-  employee_id = sys.argv[1]
-  url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
-  todo = "https://jsonplaceholder.typicode.com/todos?userId={}"
-    todo = todo.format(employee_id)
+def gather_data(employee_id):
+    """
+    Fetches employee data from API and displays TODO list progress.
+    """
+    url_user = 'https://jsonplaceholder.typicode.com/users/{}'.format(employee_id)
+    url_tasks = 'https://jsonplaceholder.typicode.com/todos?userId={}'.format(employee_id)
 
-    user_info = requests.request("GET", url).json()
-    todo_info = requests.request("GET", todo).json()
+    response_user = requests.get(url_user).json()
+    response_tasks = requests.get(url_tasks).json()
 
-    employee_name = user_info.get("name")
-    total_tasks = list(filter(lambda x: (x["completed"] is True), todo_info))
-    task_com = len(total_tasks)
-    total_task_done = len(todo_info)
+    employee_name = response_user.get('name')
+    tasks_total = len(response_tasks)
+    tasks_completed = [task for task in response_tasks if task.get('completed')]
 
-    print("Employee {} is done with tasks({}/{}):".format(employee_name,
-          task_com, total_task_done))
+    print('Employee {} is done with tasks({}/{}):'.format(
+        employee_name,
+        len(tasks_completed),
+        tasks_total
+    ))
 
-    [print("\t {}".format(task.get("title"))) for task in total_tasks]
+    for task in tasks_completed:
+        print('\t {}'.format(task.get('title')))
+
+
+if __name__ == '__main__':
+    if len(argv) != 2:
+        print('Usage: {} employee_id'.format(argv[0]))
+        exit(1)
+
+    employee_id = int(argv[1])
+    gather_data(employee_id)
+
