@@ -8,48 +8,33 @@ import requests
 import sys
 
 
-def get_name(employee_id):
-    """
-    Gets the user name based on the employee ID.
-    """
-    payload = {'id': employee_id}
-    response = requests.get('https://jsonplaceholder.typicode.com/users', params=payload)
-    user_data = response.json()
-    return user_data[0]['name']
+def main():
+    """main function"""
+    user_id = int(sys.argv[1])
+    todo_url = 'https://jsonplaceholder.typicode.com/todos'
+    user_url = 'https://jsonplaceholder.typicode.com/users/{}'.format(user_id)
+
+    response = requests.get(todo_url)
+
+    total_questions = 0
+    completed = []
+    for todo in response.json():
+
+        if todo['userId'] == user_id:
+            total_questions += 1
+
+            if todo['completed']:
+                completed.append(todo['title'])
+
+    user_name = requests.get(user_url).json()['name']
+
+    printer = ("Employee {} is done with tasks({}/{}):".format(user_name,
+               len(completed), total_questions))
+    print(printer)
+    for q in completed:
+        print("\t {}".format(q))
 
 
-def get_task(employee_id):
-    """
-    Retrieves task numbers and completed todos.
-    """
-    response = requests.get('https://jsonplaceholder.typicode.com/todos')
-    todo_list = []
-    tasks_todo = 0
-    tasks_done = 0
-    data = response.json()
-
-    for item in data:
-        if item['userId'] == employee_id:
-            tasks_todo += 1
-            if item['completed']:
-                todo_list.append(item['title'])
-                tasks_done += 1
-
-    employee_name = get_name(employee_id)
-    print("Employee {} is done with tasks({}/{}):".format(
-        employee_name,
-        tasks_done,
-        tasks_todo
-    ))
-
-    for todo in todo_list:
-        print("\t{}".format(todo))
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: {} employee_id".format(sys.argv[0]))
-        sys.exit(1)
-
-    employee_id = int(sys.argv[1])
-    get_task(employee_id)
+if __name__ == '__main__':
+    main()
+    
